@@ -10,7 +10,7 @@
 using namespace std;
 
 int sendPacket(string ip, uint port, string group){
-
+	char strmsg[255];
 	int sock = -1;
 
 	try
@@ -50,12 +50,13 @@ int sendPacket(string ip, uint port, string group){
 
 		//send a packet every 5 seconds
 		while(1){
-			std::string bla = "Blablabla";
+			fgets (strmsg, 255, stdin);
+			std::string bla = ip + ": Sertac : " + strmsg;
 
 			if (sendto(sock, bla.c_str(), bla.size(), 0, (struct sockaddr*)&multicastSender,sizeof(struct sockaddr_in)) < 0) //sent a UDP packet containing our example data
 				    perror("Sendto failed");
 			printf("Packet of size %d sent!\n", (int)bla.size());
-			sleep(5);
+			//sleep(5);
 		}
 	} catch(std::exception &e)
 	{

@@ -8,7 +8,7 @@
 
 #define PORT 14000 //The port you want to use
 #define IP "192.168.5.1" //The IP address of this computer
-#define GROUP "228.1.2.3" //The multicast group you want to use
+#define GROUP "228.0.0.0" //The multicast group you want to use
 
 using namespace std;
 
