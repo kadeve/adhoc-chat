@@ -9,7 +9,6 @@
 #include <string>
 #include <string.h> //used for the strcpy function!
 #include <time.h>
-#include <Windows.h> // included to use Sleep function
 
 #ifndef CREATEPACKET_H_
 #define CREATEPACKET_H_
