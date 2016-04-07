@@ -9,7 +9,10 @@
 #include <string>
 #include <string.h> //used for the strcpy function!
 #include <time.h>
-#include <Windows.h> // included to use Sleep function
+#include <vector>
+#include <sstream>
+#include <utility>
+//#include <Windows.h> // included to use Sleep function
 
 #ifndef CREATEPACKET_H_
 #define CREATEPACKET_H_
@@ -21,17 +24,17 @@ public:
 	CreatePacket();
 	virtual ~CreatePacket();
 
-	std::string sendPacket(int flag, int seq, std::string finaldestination, std::string originalsource, std::string message);
+	std::string sendPacket(std::string originalsource, int flag, std::string finaldestination, /*timestamp*/ int seq, int ack, std::string message);
 	void receivePacket(std::string packet);
+	vector<string> explode(string const & s, char delim);
 
 	std::string getreceiveDestination();
 	std::string getreceiveSource();
 	std::string getreceiveMessage();
-	std::string getreceiveTimestamp();
+	int getreceiveTimestamp();
 	int getreceiveSequence();
 	int getreceiveFlag();
-	int getreceiveSelect();
-
+	int getreceiveAck();
 private:
 	//if they are needed for getters, they are set in the function sendPacket (can be private)
 	std::string sendDestination;
@@ -45,14 +48,17 @@ private:
 	std::string receiveDestination;
 	std::string receiveSource;
 	int receiveSequence;
-	int receiveSelect;
+	int receiveAck;
 	int receiveFlag;
 	std::string receiveMessage;
 	std::string receiveTimestamp;
 
 	//timestamp usages
 	time_t rawtime;
-	 struct tm * timeinfo;
+	struct tm * timeinfo;
+
+	//extern const std::string ipclient;
+	vector<string> receivepacket;
 };
 }//end of namespace std
 

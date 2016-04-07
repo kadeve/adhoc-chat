@@ -6,11 +6,13 @@
 #include <stdio.h>
 #include <stdexcept>
 #include <iostream>
+#include "CreatePacket.h"
+#include "Protocols.h"
 
 using namespace std;
 
 int sendPacket(string ip, uint port, string group){
-	char strmsg[255];
+
 	int sock = -1;
 
 	try
@@ -26,7 +28,7 @@ int sendPacket(string ip, uint port, string group){
 		 * This allows you to receive multicast packets you yourself have send.
 		 * Obviously enabling this is not really useful for anything but testing
 		 */
-		char loop = 0;
+		char loop = 1;
 		if(setsockopt(sock, IPPROTO_IP, IP_MULTICAST_LOOP, (char *)&loop, sizeof(loop)) < 0)
 			throw std::runtime_error("Failed to disable loopback");
 
@@ -50,12 +52,45 @@ int sendPacket(string ip, uint port, string group){
 
 		//send a packet every 5 seconds
 		while(1){
-			fgets (strmsg, 255, stdin);
-			std::string bla = ip + ": Sertac : " + strmsg;
+
+			//get the message
+			std::string message = "Y ";
+			getline(cin,message);
+
+			string destinationip;
+			if(message[0]=='J')
+			{
+				destinationip ="192.168.5.5";
+			}
+			else if(message[0]=='S')
+			{
+				destinationip ="192.168.5.8";
+			}
+			else if(message[0]=='Y')
+			{
+				destinationip ="192.168.5.6";
+			}
+			else if(message[0]=='G')
+			{
+				destinationip ="192.168.5.2";
+			}
+			else
+			{
+				cout << "TYPE A NAME TO WHO YOU WANNA SEND, NOW IT HAS NO DESTINATION ADDRESS!" << endl;
+				cout << "Type J,S,Y or G (with a space) to communicate" <<endl;
+			}
+
+			message.erase(message.begin());
+			message.erase(message.begin());
+
+			Protocols protocol;
+			std::string bla = protocol.sendProtocols(1,ip,destinationip,message);
 
 			if (sendto(sock, bla.c_str(), bla.size(), 0, (struct sockaddr*)&multicastSender,sizeof(struct sockaddr_in)) < 0) //sent a UDP packet containing our example data
 				    perror("Sendto failed");
-			printf("Packet of size %d sent!\n", (int)bla.size());
+			cout << "Packet of size " << (int)bla.size() << " sent!" << endl;
+			//fflush(stdout);
+			//printf("Packet of size %d sent!\n", (int)bla.size());
 			//sleep(5);
 		}
 	} catch(std::exception &e)

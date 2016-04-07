@@ -80,6 +80,7 @@ int receivePacket(string ip, uint port, string group, BlockingQueue<std::string>
 			}
 		}
 	} catch(std::exception &e)	
+
 	{
 		std::cout << e.what() << std::endl;
 		exit(0);

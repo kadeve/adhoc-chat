@@ -8,6 +8,7 @@
 
 #include "CreatePacket.h"
 #include <iostream>
+#include <sstream>
 
 namespace std {
 
@@ -19,7 +20,7 @@ CreatePacket::~CreatePacket() {
 	// TODO Auto-generated destructor stub
 }
 
-string CreatePacket::sendPacket(int flag, int seq, std::string finaldestination, std::string originalsource, std::string message)
+string CreatePacket::sendPacket(std::string originalsource, int flag, std::string finaldestination, /*timestamp*/ int seq, int ack, std::string message)
 {
 	//if they are needed for getters, they are set here!!
 	sendDestination = finaldestination;
@@ -27,146 +28,98 @@ string CreatePacket::sendPacket(int flag, int seq, std::string finaldestination,
 	sendSequence = seq;
 	sendFlag = flag;
 	sendMessage = message;
+	string data;
 
-	int headerlength = 25;
-	char data[headerlength+message.length()+1];
-	int packetselect = 1;
+	data.append(originalsource);
+	data.push_back(':');
 
-	//Fill the header
-	data[0] = packetselect;
-	data[1] = flag;
-	data[2] = seq;
+	std::ostringstream fla;
+	fla << flag;
+	data.append(fla.str());
+	data.push_back(':');
 
-	//finaldestination
-	char destinationchar[finaldestination.size()];
-	strcpy(destinationchar, finaldestination.c_str());
-	destinationchar[finaldestination.size()] = 0;
-	for(unsigned int i = 0;i<finaldestination.size();i++)
-	{
-		data[i+3] = destinationchar[i];
-	}
+	data.append(finaldestination);
+	data.push_back(':');
 
-	//originalsource
-	char sourcechar[originalsource.size()];
-	strcpy(sourcechar, originalsource.c_str());
-	sourcechar[originalsource.size()] = 0;
-	for(unsigned int i = 0;i<originalsource.size();i++)
-	{
-		data[i+14] = sourcechar[i];
-	}
+	time_t timer;
+	time(&timer);
+	std::ostringstream times;
+	times << timer;
+	data.append(times.str());
+	data.push_back(':');
 
-/*	//message put inside the packet
-	char messagechar[message.size()];
-	strcpy(messagechar, message.c_str());
-	messagechar[message.size()] = 0;
-	for(unsigned int i = 0;i<message.size();i++)
-	{
-		data[i+25] = messagechar[i];
-	}*/
+	std::ostringstream se;
+	se << seq;
+	data.append(se.str());
+	data.push_back(':');
 
-	data[headerlength]=(char)NULL;
+	std::ostringstream select;
+	select << ack;
+	data.append(select.str());
+	data.push_back(':');
 
-	string messagestring(data);
+	data.append(message);
 
-	time (&rawtime);
-	timeinfo = localtime(&rawtime);
-	string timestamp = asctime(timeinfo);
-	sendTimestamp = timestamp;
-
-	//timestamp has a size of 25!!
-	messagestring.append(timestamp);
-	messagestring.append(message);
-//	cout << messagestring << endl;
-	return messagestring;
+	return data;
 }
 
 void CreatePacket::receivePacket(std::string packet)
 {
-	//packet to char array
-	char data[packet.size()];
-	strcpy(data, packet.c_str());
-	data[packet.size()] = 0;
-
-	//Fill the information fields
-	receiveSelect = data[0];
-	receiveFlag = data[1];
-	receiveSequence = data[2];
-
-	//finaldestination
-	char tmp[12];
-	//add nullpointer such that the strings at the end have an end
-	tmp[11] = (char)NULL;
-	for(unsigned int i = 0;i<11;i++)
-	{
-		tmp[i] = data[i+3];
-	}
-	string receivedestination(tmp);
-	receiveDestination = receivedestination;
-
-	//originalsource
-	//use same tmp as for the destination
-	for(unsigned int i = 0;i<11;i++)
-	{
-		tmp[i] = data[i+14];
-	}
-	string receivesource(tmp);
-	receiveSource = receivesource;
-
-	//timestamp put inside the packet!
-	char tmp2[25];
-	for(unsigned int i = 25;i<50;i++)
-	{
-		tmp2[i-25] = data[i];
-	}
-	tmp2[packet.size()-25] = (char)NULL;
-	string receivetimestamp(tmp2);
-	receiveTimestamp = receivetimestamp;
-
-	//message put inside the packet
-	//use new temporary storage
-	char tmp3[packet.size()-49];
-	for(unsigned int i = 50;i<packet.size();i++)
-	{
-		tmp3[i-50] = data[i];
-	}
-	tmp3[packet.size()-50] = (char)NULL;
-	string receivemessage(tmp3);
-	receiveMessage = receivemessage;
+	receivepacket = explode(packet, ':');
+	cout << receivepacket[0] << endl;//source
+	cout << receivepacket[1] << endl;//flag
+	cout << receivepacket[2] << endl;//destination
+	cout << receivepacket[3] << endl;//timestamp
+	cout << receivepacket[4] << endl;//sequence
+	cout << receivepacket[5] << endl;//ack
+	cout << receivepacket[6] << endl;//message
 }
 
 string CreatePacket::getreceiveDestination()
 {
-	return receiveDestination;
+	return receivepacket[2];
 }
 
 string CreatePacket::getreceiveSource()
 {
-	return receiveSource;
+	return receivepacket[0];
 }
 
 int CreatePacket::getreceiveSequence()
 {
-	return receiveSequence;
+	return stoi(receivepacket[4],nullptr,0);
 }
 
-int CreatePacket::getreceiveSelect()
+int CreatePacket::getreceiveAck()
 {
-	return receiveSelect;
+	return stoi(receivepacket[5],nullptr,0);
 }
 
 int CreatePacket::getreceiveFlag()
 {
-	return receiveFlag;
+	return stoi(receivepacket[1],nullptr,0);
 }
 
 string CreatePacket::getreceiveMessage()
 {
-	return receiveMessage;
+	return receivepacket[6];
 }
 
-string CreatePacket::getreceiveTimestamp()
+int CreatePacket::getreceiveTimestamp()
 {
-	return receiveTimestamp;
+	return stoi(receivepacket[3],nullptr,0);
+}
+
+vector<string> CreatePacket::explode(string const & s, char delim)
+{
+	vector<string> result;
+	istringstream iss(s);
+
+	for(std::string token; std::getline(iss,token,delim);)
+	{
+		result.push_back(move(token));
+	}
+	return result;
 }
 
 } /* namespace std */
