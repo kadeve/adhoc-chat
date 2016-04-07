@@ -9,10 +9,13 @@
 #include <string>
 #include <string.h> //used for the strcpy function!
 #include <time.h>
+<<<<<<< HEAD
 #include <vector>
 #include <sstream>
 #include <utility>
 //#include <Windows.h> // included to use Sleep function
+=======
+>>>>>>> origin/master
 
 #ifndef CREATEPACKET_H_
 #define CREATEPACKET_H_
