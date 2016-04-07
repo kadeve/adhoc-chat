@@ -47,41 +47,53 @@ int sendPacket(string ip, uint port, string group){
 		 */
 		struct sockaddr_in multicastSender = {0};
 		multicastSender.sin_family = AF_INET;
-		multicastSender.sin_addr.s_addr = inet_addr(group.c_str());
 		multicastSender.sin_port = htons(port);
 
 		//send a packet every 5 seconds
 		while(1){
 
 			//get the message
-			std::string message = "Y ";
+			std::string message = {};
 			getline(cin,message);
 
+			if(message.size()>0)
+			{
 			string destinationip;
 			if(message[0]=='J')
 			{
 				destinationip ="192.168.5.5";
+				cout << "Private to Jan Willem" <<endl;
+				message.erase(message.begin());
+				message.erase(message.begin());
 			}
 			else if(message[0]=='S')
 			{
-				destinationip ="192.168.5.8";
+				destinationip ="192.168.5.1";
+				cout << "Private to Sertac" <<endl;
+				message.erase(message.begin());
+				message.erase(message.begin());
 			}
 			else if(message[0]=='Y')
 			{
-				destinationip ="192.168.5.6";
+				destinationip ="192.168.5.3";
+				cout << "Private to Yvo" <<endl;
+				message.erase(message.begin());
+				message.erase(message.begin());
 			}
 			else if(message[0]=='G')
 			{
 				destinationip ="192.168.5.2";
+				cout << "Private to Gerrit" <<endl;
+				message.erase(message.begin());
+				message.erase(message.begin());
 			}
 			else
 			{
-				cout << "TYPE A NAME TO WHO YOU WANNA SEND, NOW IT HAS NO DESTINATION ADDRESS!" << endl;
-				cout << "Type J,S,Y or G (with a space) to communicate" <<endl;
+				destinationip = "228.0.0.0";
+				cout << "Multicast, send to everyone" <<endl;
 			}
 
-			message.erase(message.begin());
-			message.erase(message.begin());
+			multicastSender.sin_addr.s_addr = inet_addr(destinationip.c_str());
 
 			Protocols protocol;
 			std::string bla = protocol.sendProtocols(1,ip,destinationip,message);
@@ -92,6 +104,7 @@ int sendPacket(string ip, uint port, string group){
 			//fflush(stdout);
 			//printf("Packet of size %d sent!\n", (int)bla.size());
 			//sleep(5);
+			}
 		}
 	} catch(std::exception &e)
 	{

@@ -26,7 +26,7 @@ string Protocols::sendProtocols(int flag, string ipclient, string finaldestinati
 	CreatePacket createpacket;
 	switch(flag)
 	{
-		case 1://routing packet
+		case 1://forwarding packet
 			packettosend = createpacket.sendPacket(ipclient,flag,finaldestination,seqnrsend,acknrsend,message);
 			break;
 		case 2://forwarding packet?
@@ -36,7 +36,7 @@ string Protocols::sendProtocols(int flag, string ipclient, string finaldestinati
 
 			break;
 		case 4://ack packet?
-
+			packettosend = createpacket.sendPacket(ipclient,flag,finaldestination,seqnrsend,acknrsend,message);
 			break;
 		case 5://message packet to a desired person
 
@@ -58,14 +58,16 @@ string Protocols::receiveProtocols(string packet)
 		case 1://routing packet received, so store it inside the forwardingtable
 
 			break;
-		case 2://forwarding packet? give it a new destination!
+		case 2://forwarding packet
 
 			break;
 		case 3://syn packet?
 
 			break;
 		case 4://ack packet?
-
+			packettosend = createpacket.sendPacket(createpacket.getreceiveSource()
+					,createpacket.getreceiveFlag(),createpacket.getreceiveDestination()
+					,createpacket.getreceiveSequence(),1,"ACK");
 			break;
 		case 5://message packet to a desired person
 

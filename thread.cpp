@@ -6,6 +6,7 @@
 #include "sender.h"
 #include "BlockingQueue.h"
 #include "CreatePacket.h"
+#include "Protocols.h"
 
 #define PORT 14000 //The port you want to use
 #define IP "192.168.5.2" //The IP address of this computer
@@ -28,16 +29,20 @@ int main() {
 		CreatePacket createpacket;
 		createpacket.receivePacket(message);
 
-		std::string ipdestination;
-		for(int i=3;i<14;i++)
+		Protocols protocol;
+		if(IP==createpacket.getreceiveDestination())
 		{
-			ipdestination.push_back(message[i]);
-		}
-
-		if (IP==ipdestination)
-		{
-			cout << ipdestination << " This is a packet for you!!" << endl;
+			cout << createpacket.getreceiveDestination() << " This is a packet for you!!" << endl;
 		}
 		cout << "print it, with size: " << (int)message.size() << " message: " << message.c_str() << endl;
+
+		if(createpacket.getreceiveAck()==0 and createpacket.getreceiveFlag()==4)
+		{
+			q.push(protocol.receiveProtocols(message));
+		}
+		if(createpacket.getreceiveAck()==1 and createpacket.getreceiveFlag()==4)
+		{
+			cout << "ack is received" << endl;
+		}
 	}
 }

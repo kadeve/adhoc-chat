@@ -66,13 +66,13 @@ string CreatePacket::sendPacket(std::string originalsource, int flag, std::strin
 void CreatePacket::receivePacket(std::string packet)
 {
 	receivepacket = explode(packet, ':');
-	cout << receivepacket[0] << endl;//source
+/*	cout << receivepacket[0] << endl;//source
 	cout << receivepacket[1] << endl;//flag
 	cout << receivepacket[2] << endl;//destination
 	cout << receivepacket[3] << endl;//timestamp
 	cout << receivepacket[4] << endl;//sequence
 	cout << receivepacket[5] << endl;//ack
-	cout << receivepacket[6] << endl;//message
+	cout << receivepacket[6] << endl;//message*/
 }
 
 string CreatePacket::getreceiveDestination()
