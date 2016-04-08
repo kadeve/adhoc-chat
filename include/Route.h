@@ -5,6 +5,7 @@
  *      Author: Jaco
  */
 #include <cstdint>
+#include <string>
 
 #ifndef BASICROUTE_H_
 #define BASICROUTE_H_
@@ -14,8 +15,8 @@ public:
 	Route();
 	~Route();
 	int32_t nextHop = 0;
-	int32_t ip;
-	char* nick;
+	std::string ip = "";
+	std::string nick = "";
 	int32_t keyp = 0;
 	int32_t lastseen = 0;
 };

@@ -76,6 +76,7 @@ int receivePacket(string ip, uint port, string group, BlockingQueue<std::string>
 			// Receive packet and put its contents in data, recvfrom will block until a packet for this socket has been received
 			len = recvfrom(rsock, data, sizeof(data), 0, (struct sockaddr *) &peer_address, &peer_address_len);
 			if(len > 0){
+				cout << "receiver received a packet" << endl;
 				q.push(std::string(data, len));
 			}
 		}

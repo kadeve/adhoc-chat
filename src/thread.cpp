@@ -25,11 +25,17 @@ int main() {
 	while(1)
 	{
 		std::string message = q.pop();
-
+		cout<<"GOT A PACKET"<<endl;
 		CreatePacket createpacket;
 		createpacket.receivePacket(message);
 
 		Protocols protocol;
+		if(createpacket.getreceiveFlag()==1)
+		{
+			protocol.receiveProtocols(message);
+			cout << "forwardingpacket!!" << endl;
+		}
+
 		if(IP==createpacket.getreceiveDestination())
 		{
 			cout << createpacket.getreceiveDestination() << " This is a packet for you!!" << endl;
