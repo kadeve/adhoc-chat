@@ -1,1 +1,1 @@
-int sendPacket(std::string ip, uint port, std::string group); 
+int sendPacket(std::string ip, uint port, std::string group, BlockingQueue<std::string> &sendingQueue);

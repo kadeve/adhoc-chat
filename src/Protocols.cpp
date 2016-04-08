@@ -11,7 +11,7 @@
 
 using namespace std;
 
-Forward fietsbel;
+Forward forwardingfile;
 
 Protocols::Protocols() {
 	// TODO Auto-generated constructor stub
@@ -24,15 +24,16 @@ Protocols::~Protocols() {
 //(originalsource,flag,finaldestination,timestamp,seq,ack,message)
 string Protocols::sendProtocols(int flag, string ipclient, string finaldestination ,string message)
 {
+	packettosend.clear();
 	ip = ipclient;
 	CreatePacket createpacket;
 	switch(flag)
 	{
 		case 1://forwarding packet
-			packettosend = createpacket.sendPacket(ipclient,flag,finaldestination,seqnrsend,acknrsend,message);
+			packettosend = createpacket.sendPacket(ipclient,flag,finaldestination,0,0,message);
 			break;
 		case 2://forwarding packet?
-
+			packettosend = createpacket.sendPacket(ipclient,flag,finaldestination,seqnrsend,acknrsend,message);
 			break;
 		case 3://syn packet?
 
@@ -53,6 +54,7 @@ string Protocols::sendProtocols(int flag, string ipclient, string finaldestinati
 //(originalsource,flag,finaldestination,timestamp,seq,ack,message)
 string Protocols::receiveProtocols(string packet)
 {
+	packettosend.clear();
 	CreatePacket createpacket;
 	createpacket.receivePacket(packet);
 
@@ -61,16 +63,22 @@ string Protocols::receiveProtocols(string packet)
 	switch(createpacket.getreceiveFlag())
 	{
 		case 1://routing packet received, so store it inside the forwardingtable
-			fietsbel.setForwardingTable(createpacket.getreceiveSource(),5,createpacket.getreceiveSource(),9,createpacket.getreceiveTimestamp());
-			forward = fietsbel.getForwardingTable();
-			cout << "im here" << endl;
+			forwardingfile.setForwardingTable(createpacket.getreceiveSource(),5,createpacket.getreceiveSource(),9,createpacket.getreceiveTimestamp());
+			forwardingfile.checkforwardingTable(createpacket.getreceiveTimestamp());
+			/*cout << "fuck" << endl;
+			cout << createpacket.getreceiveMessage() << endl;
+			cout << "hello" << endl;*/
+			//forwardingfile.nexthopEntries(createpacket.getreceiveMessage());
+			forward = forwardingfile.getForwardingTable();
 			for(unsigned int i=0;i<forward.size();i++)
 			{
-			cout << forward[i].ip << endl;
-			cout << forward[i].nick << endl;
-			cout << forward[i].keyp << endl;
-			cout << forward[i].lastseen << endl;
-			cout << forward[i].nextHop << endl;
+			//cout << forward[i].ip << endl;
+			packettosend.append(forward[i].ip);
+			packettosend.append("|");
+			packettosend.append(forward[i].nick);
+			packettosend.append("|");
+			packettosend.append(to_string(forward[i].lastseen));
+			packettosend.append("|");
 			}
 			break;
 		case 2://forwarding packet
